@@ -1,0 +1,1 @@
+/usr/bin/cc -g -Wall -fanalyzer -fsanitize=undefined -fsanitize-address-use-after-scope CMakeFiles/memshell.dir/src/memshell.c.o -o memshell  -Wl,-rpath,/root/ensimag/SEPC/ensimag-malloc/cmake-build-debug libensimalloc.so 
