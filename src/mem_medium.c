@@ -35,6 +35,8 @@ void *extract_head_from_level(int i){
         void *res =  arena.TZL[i];
         // point the linkedlist head to the next block
         arena.TZL[i] = *(void **)res;
+        // erase address pointed by extracted block
+        *(void **)res = NULL;
         return res;
     }
 }
@@ -60,10 +62,12 @@ void *extract_from_level(int level, int target_idx) {
         if (current_idx == target_idx) {
             // extract the block pointed by current from the linked list
             *(void **)prev = *(void **)cur;
+            // erase address pointed by extracted block
+            *(void **)cur = NULL;
             return cur;
         }
     }
-    printf(" target index %d  not valid \n", target_idx);
+    //printf(" target index %d  not valid \n", target_idx);
     return NULL;
 }
 
@@ -74,7 +78,7 @@ int scan_level_for_buddy(int level, void *adr) {
     while(cur != NULL){
         buddy_index++;
         if ((unsigned long)adr == ((unsigned long)cur ^ (1 << level))) {
-            printf(" buddy found at index %d \n", buddy_index);
+            //printf(" buddy found at index %d \n", buddy_index);
             return buddy_index;
         }
         cur = *(void **)cur;
@@ -83,9 +87,10 @@ int scan_level_for_buddy(int level, void *adr) {
 }
 
 void return_block_to_level(int level, void *adr){
-    printf(" return block %d to level %d \n", adr, level);
+    //printf(" return block %p to level %d \n", adr, level);
     if (arena.TZL[level] == NULL){
         arena.TZL[level] = adr;
+        *(void **)adr = NULL;
         return;
     }
 
@@ -101,8 +106,8 @@ void return_block_to_level(int level, void *adr){
         *((unsigned long *)adr + 1)= 0;
         *((unsigned long *)buddy + 1)= 0;
         // erase the addresses marked on two blocks
-        *(void **)adr= 0;
-        *(void **)buddy= 0;
+        *(void **)adr= NULL;
+        *(void **)buddy= NULL;
 
         if (adr > buddy)
             adr = buddy;
@@ -144,7 +149,7 @@ void fill_empty_level(int level){
 
     if (level == current_max_idx)
     {
-        printf(" +++++ Call mem_realloc_medium at level %d \n", level);
+        //printf(" +++++ Call mem_realloc_medium at level %d \n", level);
         mem_realloc_medium();
         return;
     }
@@ -158,12 +163,11 @@ void fill_empty_level(int level){
 
     // calculate the middle of the extracted block
     void *middle = new_block + (1 << (level));
+    // erase all data of first 8 bytes of 2nd block
+    *(void**)middle = NULL;
     // point the first half to 2nd half, forming 2 linked blocks of size 2^i
     *(void **)new_block = middle;
 
-    // mark the block size
-    // *((unsigned long *)middle + 1)= (1 << (level));
-    // *((unsigned long *)new_block + 1) = (1 << (level));
 
     // add the two new block to the head of linkedlist at TZL[i]
     arena.TZL[level] = new_block;
@@ -177,26 +181,27 @@ void *emalloc_medium(unsigned long request_size)
     assert(total_request_size > SMALLALLOC);
 
     // calculate the closest indice
-    int idx_size = puiss2(total_request_size + 32);
-    printf(" >>> Allocation REQUEST at level %d \n", idx_size);
+    int idx_size = puiss2(total_request_size);
 
     if (arena.TZL[idx_size] == NULL) {
         fill_empty_level(idx_size);
     }
-    void *ptr = extract_head_from_level(idx_size);
+    void *block_ptr = extract_head_from_level(idx_size);
+    //printf(" >>> emalloc_medium >> Allocation REQUEST of %lu bytes, match level %d \n", total_request_size, idx_size);
 
     unsigned long allocated_block_size = (1 << idx_size);
-    return mark_memarea_and_get_user_ptr(ptr, allocated_block_size, MEDIUM_KIND);;
+    //printf(" >>> emalloc_medium >> allocated bytes = %lu at %p \n", allocated_block_size, block_ptr);
+
+    return mark_memarea_and_get_user_ptr(block_ptr, allocated_block_size, MEDIUM_KIND);;
 }
 
 void efree_medium(Alloc a) {
     /* ecrire votre code ici */
 
-    //assert(a.size < LARGEALLOC);
-    //assert(a.size > SMALLALLOC);
     // calculate the closest indice
     int idx_size = puiss2(a.size);
-    printf(" >>> return block to level %d \n", idx_size);
+
+    //printf(" >>> efree_medium >> return block of adresse %p of size %lu to level %d \n", a.ptr, a.size, idx_size);
     return_block_to_level(idx_size, a.ptr);
 
 }

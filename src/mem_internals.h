@@ -51,7 +51,7 @@ typedef struct _Alloc {
 extern MemArena arena;
 
 unsigned long knuth_mmix_one_round(unsigned long in);
-void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k);
+void *mark_memarea_and_get_user_ptr(void *block_ptr, unsigned long size, MemKind k);
 Alloc mark_check_and_get_alloc(void *user_ptr);
 unsigned int nb_TZL_entries();
     

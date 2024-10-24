@@ -63,7 +63,7 @@ void *emalloc_small(unsigned long size)
 
     // extract the first block from the linkedList
     void *ptr = extract_head_chunk_pool();
-    printf(" chunk pool count = %d  \n", count_chunk_pool());
+    //printf(" chunk pool count = %d  \n", count_chunk_pool());
 
     return mark_memarea_and_get_user_ptr(ptr, CHUNKSIZE, SMALL_KIND);
 

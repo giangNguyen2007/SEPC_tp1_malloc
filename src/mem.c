@@ -41,15 +41,15 @@ void efree(void *ptr)
     Alloc a = mark_check_and_get_alloc(ptr);
     switch( a.kind ) {
 	    case SMALL_KIND:
-	    	printf("free small kind \n");
+	    	//printf("free small kind \n");
 		efree_small(a);
 		break;
 	    case MEDIUM_KIND:
-	    	printf("free medium kind \n");
+	    	//printf("free medium kind \n");
 		efree_medium(a);
 		break;
 	    case LARGE_KIND:
-	    	printf("free large kind \n");
+	    	//printf("free large kind \n");
 		efree_large(a);
 		break;
 	    default:

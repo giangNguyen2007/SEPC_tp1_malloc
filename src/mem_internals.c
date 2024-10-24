@@ -15,13 +15,13 @@ unsigned long knuth_mmix_one_round(unsigned long in)
     return in * 6364136223846793005UL % 1442695040888963407UL;
 }
 
-void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
+void *mark_memarea_and_get_user_ptr(void *block_ptr, unsigned long size, MemKind k)
 {
 	/* ecrire votre code ici */
-	unsigned long  magic_number = knuth_mmix_one_round((unsigned long)ptr & ~(0b11UL));
+	unsigned long  magic_number = knuth_mmix_one_round((unsigned long)block_ptr & ~(0b11UL));
 
-	unsigned long *head_ptr = (unsigned long*)ptr;
-	unsigned long *tail_ptr = (unsigned long*)(ptr + size - 16);
+	unsigned long *head_ptr = (unsigned long*)block_ptr;
+	unsigned long *tail_ptr = (unsigned long*)(block_ptr + size - 16);
 
 	// set size
 	*head_ptr = size;

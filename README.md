@@ -1,1 +1,0 @@
-# SEPC_tp1_malloc

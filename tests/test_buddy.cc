@@ -44,13 +44,14 @@ TEST(Medium,buddy) {
   efree(m1);
   efree(m2);
   ASSERT_EQ( nb_TZL_entries(), 1U);
+    // after fusion, the merge allow to get back the same full block
+    void *mref3 = emalloc(ALLOC_MEM_SIZE);
+    ASSERT_NE( mref3, (void *)0 );
+    memset(mref3, 1, ALLOC_MEM_SIZE);
+    ASSERT_EQ( mref3, mref );
+    ASSERT_EQ( nb_TZL_entries(), 0U);
+    efree(mref3);
+    ASSERT_EQ( nb_TZL_entries(), 1U);
 
-  // after fusion, the merge allow to get back the same full block
-  void *mref3 = emalloc(ALLOC_MEM_SIZE);
-  ASSERT_NE( mref3, (void *)0 );
-  memset(mref3, 1, ALLOC_MEM_SIZE);
-  ASSERT_EQ( mref3, mref );
-  ASSERT_EQ( nb_TZL_entries(), 0U);
-  efree(mref3);
-  ASSERT_EQ( nb_TZL_entries(), 1U);
+
 }
